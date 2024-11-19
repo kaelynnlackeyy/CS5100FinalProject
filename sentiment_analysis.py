@@ -13,7 +13,7 @@ from transformers import pipeline
 
 df=pd.read_csv('player_news_table.csv')
 
-df['player_news']= df['player_news'].fillna("").astype(str)
+df['player_news']=df['player_news'].fillna("").astype(str).str.replace(r"SOURCE:.*", "",regex=True).str.strip()
 print("here")
 analyzer=pipeline("sentiment-analysis",model="distilbert-base-uncased-finetuned-sst-2-english",truncation=True)
 sent_labels=[]
