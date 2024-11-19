@@ -74,7 +74,8 @@ def fill_database(players, fumbles, passing, rushing, receiving, returning, arti
                             'receiving_yards_after_catch', 'receiving_first_downs', 'receiving_epa', 'racr', 'target_share', 'air_yards_share', 'wopr', 'fantasy_points'], axis = 1, inplace = True)
         
         player_stats_df.drop(player_stats_df[~player_stats_df['position_group'].isin(viable_positions)].index, inplace = True)
-        player_stats_df.drop(player_stats_df[player_stats_df.season < 2016].index, inplace = True)
+        player_stats_df.drop(player_stats_df[player_stats_df.season < 2017].index, inplace = True)
+        player_stats_df.drop(player_stats_df[player_stats_df.season > 2023].index, inplace = True)
         player_stats_df.drop(player_stats_df[player_stats_df.season_type != 'REG'].index, inplace = True)
        
         # Create the players table and load it in
@@ -126,7 +127,9 @@ def personal_player_stats(player_stats_df, players_df):
     # Create a dataframe that contains players' personal data
     player_data_df = pd.read_csv('yearly_player_data_includes_player_info.csv')
     adp_values = pd.read_csv('adp_merged_7_17.csv')
-    player_data_df = sqldf('SELECT pid AS playerId, height, weight, age, injuries, adp, player_stats_df.fantasy_points_ppr as totalPoints, player_data_df.season AS year FROM player_data_df INNER JOIN adp_values ON(player_data_df.player_name = adp_values.name AND player_data_df.season = adp_values.Year) INNER JOIN players_df ON (players_df.playerName = player_data_df.player_name) INNER JOIN player_stats_df ON (player_data_df.player_name = player_stats_df.player_display_name AND player_data_df.season = player_stats_df.season)')
+    player_data_df = sqldf('SELECT pid AS playerId, height, weight, age, injuries, adp, player_stats_df.fantasy_points_ppr as totalPoints, player_data_df.season AS year FROM player_data_df LEFT JOIN adp_values ON(player_data_df.player_name = adp_values.name AND player_data_df.season = adp_values.Year) INNER JOIN players_df ON (players_df.playerName = player_data_df.player_name) INNER JOIN player_stats_df ON (player_data_df.player_name = player_stats_df.player_display_name AND player_data_df.season = player_stats_df.season)')
+
+    player_data_df.fillna({'adp': -1.0}, inplace=True) # Replace NULL adp with -1.0
 
     return player_data_df
 
