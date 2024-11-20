@@ -64,8 +64,8 @@ def save_team_to_excel(team, file_name="final_team.xlsx"):
 # Step 3: Define Constraints
 position_constraints = {
     1: (1, 3),  # Min 1, Max 3 QB
-    2: (2, 4),  # Min 2, Max 4 RB
-    3: (4, 6),  # Min 4, Max 6 WR
+    2: (2, 5),  # Min 2, Max 5 RB
+    3: (2, 5),  # Min 2, Max 5 WR
     4: (1, 3),  # Min 1, Max 3 TE
 }
 
