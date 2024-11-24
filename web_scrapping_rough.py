@@ -47,7 +47,7 @@ player_news_date=[]
 data_collector()
 
 
-for i in range(0,430):
+for i in range(0,1871):
     #moving to next page 
     wait = WebDriverWait(driver, 10)  # 10 seconds timeout
     next_button = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'next')))
