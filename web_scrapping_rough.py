@@ -69,5 +69,3 @@ df.head()
 print(len(df))
 
 df.to_csv('player_news_table.csv', index=False)
-        
-    
