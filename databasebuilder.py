@@ -2,6 +2,8 @@ import datetime
 from sqlalchemy import create_engine, text, MetaData, Table, Column, Integer, String, ForeignKey, Text, Float, Date, insert
 import pandas as pd
 from pandasql import sqldf
+import re
+from datetime import datetime
 
 user = 'admin'
 password = 'fillerpassword'
@@ -36,7 +38,6 @@ def database_layout():
     passing = Table('passing', metadata, Column('psid', Integer, primary_key = True, autoincrement = True), Column('playerId', Integer, ForeignKey('players.pid')), Column('passingYards', Integer), Column('attempts', Integer), Column('completions', Integer), Column('interceptions', Integer), Column('sacks', Integer), Column('passingTDs', Integer), Column('passing2Pts', Integer), Column('year', Integer))
     rushing = Table('rushing', metadata, Column('rsid', Integer, primary_key = True, autoincrement = True), Column('playerId', Integer, ForeignKey('players.pid')), Column('rushingYards', Integer), Column('carries', Integer), Column('rushingTDs', Integer), Column('rushing2Pts', Integer), Column('year', Integer))
     receiving = Table('receiving', metadata, Column('recsid', Integer, primary_key = True, autoincrement = True), Column('playerId', Integer, ForeignKey('players.pid')), Column('receptions', Integer), Column('targets', Integer), Column('receivingYards', Integer), Column('receivingTDs', Integer), Column('receiving2Pts', Integer), Column('year', Integer))
-    returning = Table('returning', metadata, Column('retsid', Integer, primary_key = True, autoincrement = True), Column('playerId', Integer, ForeignKey('players.pid')), Column('specialTeamsTDs', Integer), Column('year', Integer))
     articles = Table('articles', metadata, Column('aid', Integer, primary_key = True, autoincrement = True), Column('playerId', Integer, ForeignKey('players.pid')), Column('articleText', Text(length = 16777215)), Column('articleScore', Integer), Column('date', Date))
     playerRankingByYear = Table('playerRankingByYear', metadata, Column('prid', Integer, primary_key = True, autoincrement = True), Column('playerId', Integer, ForeignKey('players.pid')), Column('height', Integer), Column('weight', Integer), Column('age', Integer), Column('injuries', Integer), Column('adp', Float), Column('totalPoints', Integer), Column('year', Integer))
     metadata.create_all(engine)
@@ -47,7 +48,7 @@ def database_layout():
         conn.execute(stmt)
         conn.commit()
 
-        fill_database(players, fumbles, passing, rushing, receiving, returning, articles, playerRankingByYear)
+        fill_database(players, fumbles, passing, rushing, receiving, articles, playerRankingByYear)
 
 
 '''
@@ -55,7 +56,7 @@ Function: Takes in data from the CSV file, manipulates it, and loads it into the
 Parameters: Takes in tables for the data to be loaded into
 Returns: None
 '''
-def fill_database(players, fumbles, passing, rushing, receiving, returning, articles, playerRankingByYear):
+def fill_database(players, fumbles, passing, rushing, receiving, articles, playerRankingByYear):
     engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database_name}")
 
     with engine.connect() as conn:
@@ -75,7 +76,6 @@ def fill_database(players, fumbles, passing, rushing, receiving, returning, arti
         
         player_stats_df.drop(player_stats_df[~player_stats_df['position_group'].isin(viable_positions)].index, inplace = True)
         player_stats_df.drop(player_stats_df[player_stats_df.season < 2017].index, inplace = True)
-        player_stats_df.drop(player_stats_df[player_stats_df.season > 2023].index, inplace = True)
         player_stats_df.drop(player_stats_df[player_stats_df.season_type != 'REG'].index, inplace = True)
        
         # Create the players table and load it in
@@ -96,6 +96,7 @@ def fill_database(players, fumbles, passing, rushing, receiving, returning, arti
         rushing_stats_df = sqldf('SELECT pid as playerId, rushing_yards as rushingYards, carries, rushing_tds as rushingTDs, rushing_2pt_conversions as rushing2Pts, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName) GROUP BY player_id, season')
         receiving_stats_df = sqldf('SELECT pid as playerId, receptions, targets, receiving_yards as receivingYards, receiving_tds as receivingTDs, receiving_2pt_conversions as receiving2Pts, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName) GROUP BY player_id, season')
         player_data_df = personal_player_stats(player_stats_df, players_df)
+        articles_df = article_df_creator(players_df)
 
         # Prepare data to be loaded
         fumble_stats_df = fumble_stats_df.to_dict(orient = 'records')
@@ -103,6 +104,7 @@ def fill_database(players, fumbles, passing, rushing, receiving, returning, arti
         rushing_stats_df = rushing_stats_df.to_dict(orient = 'records')
         receiving_stats_df = receiving_stats_df.to_dict(orient = 'records')
         player_data_df = player_data_df.to_dict(orient = 'records')
+        articles_df = articles_df.to_dict(orient = 'records')
 
         # Load data
         fumbles_stmt = insert(fumbles).values(fumble_stats_df)
@@ -110,12 +112,14 @@ def fill_database(players, fumbles, passing, rushing, receiving, returning, arti
         rushing_stmt = insert(rushing).values(rushing_stats_df)
         receiving_stmt = insert(receiving).values(receiving_stats_df)
         playerRankingByYear_stmt = insert(playerRankingByYear).values(player_data_df)
+        articles_stmt = insert(articles).values(articles_df)
 
         conn.execute(fumbles_stmt)
         conn.execute(passing_stmt)
         conn.execute(rushing_stmt)
         conn.execute(receiving_stmt)
         conn.execute(playerRankingByYear_stmt)
+        conn.execute(articles_stmt)
         conn.commit()
 
 '''
@@ -132,6 +136,32 @@ def personal_player_stats(player_stats_df, players_df):
     player_data_df.fillna({'adp': -1.0}, inplace=True) # Replace NULL adp with -1.0
 
     return player_data_df
+
+'''
+Function: Loads a dataframe with the articles, scores, dates, and the player IDs
+Parameters: Takes in the dataframe for players and their playerID.
+Return: A dataframe containing the players' ID and their associated articles.
+'''
+def article_df_creator(players_df):
+    # Extracts the date from the dataframe string.
+    def extract_date(text):
+        date_pattern = r"\b\d{1,2}/\d{1,2}/\d{4}\b"
+        extracted_date = re.search(date_pattern, text).group()
+        date_object = datetime.strptime(extracted_date, "%m/%d/%Y")
+
+        return date_object.strftime("%Y-%m-%d")
+
+    # Extracts a player's name from the dataframe string.
+    def extract_name(text):
+        text_split = text.split(" - ")
+        return text_split[0]
+    
+    articles_df = pd.read_csv('player_news_table_with_labels.csv')
+    articles_df['player_news_date'] = articles_df['player_news_date'].apply(extract_date)
+    articles_df['player_name'] = articles_df['player_name'].apply(extract_name)
+    articles_w_players = sqldf('SELECT pid AS playerId, player_news AS articleText, label AS articleScore, player_news_date AS date FROM articles_df INNER JOIN players_df ON (articles_df.player_name = players_df.playerName)')
+    return articles_w_players
+    
 
 def main():
     create_database()
