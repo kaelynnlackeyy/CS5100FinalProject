@@ -91,11 +91,11 @@ def fill_database(players, fumbles, passing, rushing, receiving, articles, playe
         players_df = pd.DataFrame(result.fetchall(), columns = ['pid', 'playerName', 'position'])
         
         # Set up other tables in database
-        fumble_stats_df = sqldf("SELECT pid as playerId, (sack_fumbles + rushing_fumbles + receiving_fumbles) as fumbles, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName) GROUP BY player_id, season")
-        passing_stats_df = sqldf('SELECT pid as playerId, passing_yards as passingYards, attempts, completions, interceptions, sacks, passing_tds as passingTDs, passing_2pt_conversions as passing2Pts, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName) GROUP BY player_id, season')
-        rushing_stats_df = sqldf('SELECT pid as playerId, rushing_yards as rushingYards, carries, rushing_tds as rushingTDs, rushing_2pt_conversions as rushing2Pts, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName) GROUP BY player_id, season')
-        receiving_stats_df = sqldf('SELECT pid as playerId, receptions, targets, receiving_yards as receivingYards, receiving_tds as receivingTDs, receiving_2pt_conversions as receiving2Pts, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName) GROUP BY player_id, season')
-        player_data_df = personal_player_stats(player_stats_df, players_df)
+        fumble_stats_df = sqldf("SELECT pid as playerId, (sack_fumbles + rushing_fumbles + receiving_fumbles) as fumbles, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName AND player_stats_df.posid = players_df.position) GROUP BY player_id, season")
+        passing_stats_df = sqldf('SELECT pid as playerId, passing_yards as passingYards, attempts, completions, interceptions, sacks, passing_tds as passingTDs, passing_2pt_conversions as passing2Pts, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName AND player_stats_df.posid = players_df.position) GROUP BY player_id, season')
+        rushing_stats_df = sqldf('SELECT pid as playerId, rushing_yards as rushingYards, carries, rushing_tds as rushingTDs, rushing_2pt_conversions as rushing2Pts, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName AND player_stats_df.posid = players_df.position) GROUP BY player_id, season')
+        receiving_stats_df = sqldf('SELECT pid as playerId, receptions, targets, receiving_yards as receivingYards, receiving_tds as receivingTDs, receiving_2pt_conversions as receiving2Pts, season as year FROM player_stats_df INNER JOIN players_df ON (player_stats_df.player_display_name = players_df.playerName AND player_stats_df.posid = players_df.position) GROUP BY player_id, season')
+        player_data_df = personal_player_stats(player_stats_df, players_df, positions_df)
         articles_df = article_df_creator(players_df)
 
         # Prepare data to be loaded
@@ -127,11 +127,13 @@ Function: Creates a dataframe that contains all personal stats about players
 Parameters: Takes in 2 dataframes to help build the final dataframe
 Return: A dataframe containing personal stats about players 
 '''
-def personal_player_stats(player_stats_df, players_df):
+def personal_player_stats(player_stats_df, players_df, positions_df):
     # Create a dataframe that contains players' personal data
     player_data_df = pd.read_csv('yearly_player_data_includes_player_info.csv')
+    player_data_df = sqldf('SELECT player_data_df.*, posid FROM player_data_df INNER JOIN positions_df ON (player_data_df.position = positions_df.positions)')
     adp_values = pd.read_csv('adp_merged_7_17.csv')
-    player_data_df = sqldf('SELECT pid AS playerId, height, weight, age, injuries, adp, player_stats_df.fantasy_points_ppr as totalPoints, player_data_df.season AS year FROM player_data_df LEFT JOIN adp_values ON(player_data_df.player_name = adp_values.name AND player_data_df.season = adp_values.Year) INNER JOIN players_df ON (players_df.playerName = player_data_df.player_name) INNER JOIN player_stats_df ON (player_data_df.player_name = player_stats_df.player_display_name AND player_data_df.season = player_stats_df.season)')
+    adp_values = sqldf('SELECT name, posid, adp, Year FROM adp_values INNER JOIN positions_df ON (adp_values.position = positions_df.positions)')
+    player_data_df = sqldf('SELECT pid AS playerId, height, weight, age, injuries, adp, player_stats_df.fantasy_points_ppr as totalPoints, player_data_df.season AS year FROM player_data_df LEFT JOIN adp_values ON(player_data_df.player_name = adp_values.name AND player_data_df.season = adp_values.Year AND player_data_df.posid = adp_values.posid) INNER JOIN players_df ON (players_df.playerName = player_data_df.player_name) INNER JOIN player_stats_df ON (player_data_df.player_name = player_stats_df.player_display_name AND player_data_df.season = player_stats_df.season AND player_data_df.posid = player_stats_df.posid)')
 
     player_data_df.fillna({'adp': -1.0}, inplace=True) # Replace NULL adp with -1.0
 
