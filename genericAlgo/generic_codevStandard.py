@@ -1,6 +1,7 @@
 import pandas as pd
 import random
 import numpy as np
+import stat_puller
 
 # Step 1: Debugging Functions
 def debug_agent_scores(agent_weights, players):
@@ -92,13 +93,13 @@ def select_team(agent_weights, players, pick_order):
         # For the first pick, there are no ADP constraints
         if i == 0:
             filtered_players = [
-                p for p in players if p["playerId"] not in selected_player_ids
+                p for p in players if p["pid"] not in selected_player_ids
             ]
         else:
             # Apply ADP constraint for subsequent picks
             filtered_players = [
                 p for p in players 
-                if p["adp"] >= round_pick and p["playerId"] not in selected_player_ids
+                if p["adp"] >= round_pick and p["pid"] not in selected_player_ids
             ]
 
         # Calculate scores for the filtered players
@@ -116,7 +117,7 @@ def select_team(agent_weights, players, pick_order):
             if position_counts[pos] < position_constraints[pos][1]:  # Check max constraint
                 team.append(player)
                 position_counts[pos] += 1
-                selected_player_ids.add(player["playerId"])  # Mark as selected
+                selected_player_ids.add(player["pid"])  # Mark as selected
                 break  # Proceed to the next pick
 
     # Validate the team satisfies all constraints
@@ -151,9 +152,10 @@ def inject_random_agents(population, pop_size, attribute_keys, injection_rate=0.
 # Step 8: Run Genetic Algorithm
 def genetic_algorithm(players, pick_order, pop_size=50, generations=200):
     attribute_keys = [
-        "height", "weight", "age", "injuries", "fid", "fumbles", "rsid", "rushingYards",
-        "carries", "rushingTDs", "rushing2Pts", "recsid", "receptions", "targets",
-        "receivingYards", "receivingTDs", "receiving2Pts"
+        "height", "weight", "age", "injuries", "passingYards", "attempts", "completions", 
+        "interceptions", "sacks", "passingTDs", "passing2Pts", "receptions", "targets", 
+        "receivingYards", "receivingTDs", "receiving2Pts", "rushingYards", "carries", 
+        "rushingTDs", "rushing2Pts", "fumbles", "avgArticleScore"
     ]
     population = generate_initial_population(pop_size, attribute_keys)
 
@@ -205,7 +207,9 @@ def genetic_algorithm(players, pick_order, pop_size=50, generations=200):
     return best_team, best_agent
 
 # Run the Process
-file_path = "/Users/7one/Documents/NortheasternDengfeng/Study in NEU/1 - Master Course/CS5100 Foundations Artificial Intelligence/FinalProject/table/demo180.xlsx"
+season = int(input('Enter the season you wish to draft for: '))
+stat_puller.data_grabber(season)
+file_path = f"stats_for_{season}.xlsx"
 players = load_player_data(file_path)
 pick_order = [1, 24, 25, 48, 49, 72, 73, 96, 97, 120, 121, 144, 145, 168]  # Custom pick order
 best_team, best_agent = genetic_algorithm(players, pick_order, pop_size=50, generations=200)
