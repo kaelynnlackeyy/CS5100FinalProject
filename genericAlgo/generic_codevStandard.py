@@ -151,9 +151,10 @@ def inject_random_agents(population, pop_size, attribute_keys, injection_rate=0.
 # Step 8: Run Genetic Algorithm
 def genetic_algorithm(players, pick_order, pop_size=50, generations=200):
     attribute_keys = [
-        "height", "weight", "age", "injuries", "fid", "fumbles", "rsid", "rushingYards",
-        "carries", "rushingTDs", "rushing2Pts", "recsid", "receptions", "targets",
-        "receivingYards", "receivingTDs", "receiving2Pts"
+        "height", "weight", "age", "injuries", "passingYards", "attempts", "completions", 
+        "interceptions", "sacks", "passingTDs", "passing2Pts", "receptions", "targets", 
+        "receivingYards", "receivingTDs", "receiving2Pts", "rushingYards", "carries", 
+        "rushingTDs", "rushing2Pts", "fumbles", "avgArticleScore"
     ]
     population = generate_initial_population(pop_size, attribute_keys)
 
