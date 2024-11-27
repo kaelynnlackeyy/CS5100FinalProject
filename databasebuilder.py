@@ -135,7 +135,7 @@ def personal_player_stats(player_stats_df, players_df, positions_df):
     adp_values = sqldf('SELECT name, posid, adp, Year FROM adp_values INNER JOIN positions_df ON (adp_values.position = positions_df.positions)')
     player_data_df = sqldf('SELECT pid AS playerId, height, weight, age, injuries, adp, player_stats_df.fantasy_points_ppr as totalPoints, player_data_df.season AS year FROM player_data_df LEFT JOIN adp_values ON(player_data_df.player_name = adp_values.name AND player_data_df.season = adp_values.Year AND player_data_df.posid = adp_values.posid) INNER JOIN players_df ON (players_df.playerName = player_data_df.player_name) INNER JOIN player_stats_df ON (player_data_df.player_name = player_stats_df.player_display_name AND player_data_df.season = player_stats_df.season AND player_data_df.posid = player_stats_df.posid)')
 
-    player_data_df.fillna({'adp': -1.0}, inplace=True) # Replace NULL adp with -1.0
+    player_data_df.fillna({'adp': 500.0}, inplace=True) # Replace NULL adp with -1.0
 
     return player_data_df
 
