@@ -17,14 +17,6 @@ for j in sub_lists.keys():
 
 agent_history = ret_list
 
-y = [
-    [3000, 2900, 2800, 2700, 2600],  # Data for Line 1
-    [2500, 2400, 2300, 2200, 2100],  # Data for Line 2
-    [2000, 2100, 2200, 2300, 2400]   # Data for Line 3
-]
-
-x = [1, 2, 3, 4, 5]
-
 def create_graph(x, y):
     x_data, y_data = [], []
 
