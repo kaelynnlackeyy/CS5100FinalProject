@@ -1,3 +1,12 @@
+# Fantasy Football Agent: Find Optimal Draft Picks using Genetic Algorithms
+
+----
+Overview
+---
+This project provides an AI agent that uses a genetic algorithm to calculate the optimal draft picks
+for the year.
+
+
 {\rtf1\ansi\ansicpg936\cocoartf2761
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;\f2\fswiss\fcharset0 Helvetica-Oblique;
 }
