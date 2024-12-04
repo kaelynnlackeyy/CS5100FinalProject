@@ -63,4 +63,12 @@ Tips: all the document are in the geneticAlgo file
      4. **Excel File**: The final picked team for both the ADP team and the optimized team based on the best agent.
 
 
+Result : ![alt text](image.png)
+
 ## Acknowledgements
+
+### [A genetic algorithm to solve the production lot-sizing problem with capacity adjustment](https://www.sciencedirect.com/science/article/pii/S0305054824002788)
+
+### [Draft-Kings-Genetic-Solution](https://github.com/Rogerctoussaint/Draft-Kings-Genetic-Solution), reference in drafting
+
+### [Top-Genetic-Algorithm](https://github.com/rafa2000/Top-Genetic-Algorithm/blob/master/readme.md), Many ideas on GA
