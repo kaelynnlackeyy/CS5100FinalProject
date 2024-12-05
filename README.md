@@ -26,12 +26,14 @@ we calculated the average performance of a team composed of players selected bas
 If you wish to run as is only follow steps 1 and 5. If you wish to make updates steps 3, 4, 5 will walk you through how to do that.
 
 1. Create an AWS MySQL server, and save all login information into `databasebuilder.py`. You will also need to save this information into `datainjectionFromAWS.py`.
------------------------------------------------------------------- IF YOU WISH TO UPDATE THE DATA -----------------------------------------------------------------------
+
+# IF YOU WISH TO UPDATE THE DATA
 2. You will need to replace all CSV files with CSV files containing updated data, and adjust the `databasebuilder.py` to handle the differences in these files. Adjust the function fill_database and personal_player_stats to reflect the new CSVs you will be loading in.
------------------------------------------------------------------- IF YOU WISH TO REPLACE THE ARTICLES ------------------------------------------------------------------
+
+# IF YOU WISH TO REPLACE THE ARTICLES
 3. Adjust the range in the for loop on line 50 in the file `web_scrapping_rough.py`. This will change which page it goes back to. To check if a page is correct for you https://tools.thehuddle.com/nfl-fantasy-football-player-news/0/all-teams/?page=<PAGE_NUMBER> use this URL and replace PAGE_NUMBER with the page you wish to check out. I recommend putting this after an NFL draft has occurred. Usually May 2nd is safe.
 4. Run both `web_scrapping_rough.py` and `sentiment_analysis.py`.
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   
 5. Run `databasebuilder.py` to create the database in your MySQL server.
 
 ### Prequisites
