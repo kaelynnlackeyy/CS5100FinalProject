@@ -18,7 +18,7 @@ To achieve this, we collected data on each player and used a genetic algorithm t
 Teams were ranked by the total points scored by their selected players over a season. For comparison, 
 we calculated the average performance of a team composed of players selected based on their ADP at the same draft positions. 
 
-## Features
+# Features
 
 # Database Creation
 - You can create the database to base the algorithm off of from these files.
