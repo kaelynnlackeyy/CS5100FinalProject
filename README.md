@@ -23,8 +23,20 @@ we calculated the average performance of a team composed of players selected bas
 ## Document Overview
 
 ## Getting Started
+If you wish to run as is only follow steps 1 and 5. If you wish to make updates steps 3, 4, 5 will walk you through how to do that.
+
+1. Create an AWS MySQL server, and save all login information into `databasebuilder.py`. You will also need to save this information into `datainjectionFromAWS.py`.
+------------------------------------------------------------------ IF YOU WISH TO UPDATE THE DATA -----------------------------------------------------------------------
+2. You will need to replace all CSV files with CSV files containing updated data, and adjust the `databasebuilder.py` to handle the differences in these files. Adjust the function fill_database and personal_player_stats to reflect the new CSVs you will be loading in.
+------------------------------------------------------------------ IF YOU WISH TO REPLACE THE ARTICLES ------------------------------------------------------------------
+3. Adjust the range in the for loop on line 50 in the file `web_scrapping_rough.py`. This will change which page it goes back to. To check if a page is correct for you https://tools.thehuddle.com/nfl-fantasy-football-player-news/0/all-teams/?page=<PAGE_NUMBER> use this URL and replace PAGE_NUMBER with the page you wish to check out. I recommend putting this after an NFL draft has occurred. Usually May 2nd is safe.
+4. Run both `web_scrapping_rough.py` and `sentiment_analysis.py`.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+5. Run `databasebuilder.py` to create the database in your MySQL server.
 
 ### Prequisites
+
+Have Python 3.11 installed. Create a virtual environment and load the libraries needed from `requirements.txt`. You will also need a Chromium driver in your Python path.
 
 ### Installation
 
@@ -36,7 +48,7 @@ Tips: all the document are in the geneticAlgo file
 
 ### **Quick Start Steps**
 1. **Get the Data**
-   - Run `datainjectionFromAWS.py` to fetch the cooked data from the AWS database.
+   - Run `datainjectionFromAWS.py` to fetch the data from the AWS database.
 
 2. **Save the Data**
    - Find a local path to store the source data.
@@ -47,7 +59,7 @@ Tips: all the document are in the geneticAlgo file
 
 4. **Check the Output**
    - After running the driver, you will get the following results:
-     1. **Chart**: A visual comparison between the final team and the ADP team.
+     1. **Chart**: A visual comparison between the final team and the ADP team. 
      2. **Excel File**: The final picked team with its detailed data organized by years.
      3. **Excel File**: Recommended agent with its optimized weights.
      4. **Excel File**: ADP reference team with its detailed data organized by years.
