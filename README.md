@@ -71,7 +71,7 @@ we calculated the average performance of a team composed of players selected bas
 - yearly_player_data_includes_player_info.csv: Got player health information from here.
 
 ## Getting Started
-If you wish to run as is only follow steps 1 and 5. If you wish to make updates steps 3, 4, 5 will walk you through how to do that.
+If you wish to run as is only follow steps 1 and 5. If you wish to make update for a year not between 2017-2023 steps 3, 4, 5 will walk you through how to do that.
 
 1. Create an AWS MySQL server, and save all login information into `databasebuilder.py`. You will also need to save this information into `datainjectionFromAWS.py`.
 2. You will need to replace all CSV files with CSV files containing updated data, and adjust the `databasebuilder.py` to handle the differences in these files. Adjust the function fill_database and personal_player_stats to reflect the new CSVs you will be loading in.
@@ -83,9 +83,6 @@ If you wish to run as is only follow steps 1 and 5. If you wish to make updates 
 
 Have Python 3.11 installed. Create a virtual environment and load the libraries needed from `requirements.txt`. You will also need a Chromium driver in your Python path.
 
-### Installation
-
-## Model and Tokenizer
 # Genetic Algorithm and Validation Code: Quick Start Guide
 
 ## **Guideline for Genetic Algorithm Code**
