@@ -3,8 +3,20 @@
 
 ## Overview
 
+Fantasy football has a massive following, with the two largest platforms being ESPN (twelve million users) and Yahoo (ten million users). 
+Most users rely on little more than a gut feeling, advice from podcasts or articles, and the ADP (average draft position) provided by their respective platforms.
 
-This project provides an AI agent that uses a genetic algorithm to find optimal draft picks for the year. Additionall, it features a 
+What is fantasy football?    
+Fantasy football is a virtual game where users select a unique set of players to compete with for the entire season. To win a week in fantasy football, 
+your players must score more total points than your opponent's players. Players are selected through a draft process, where a group of users takes turns picking players. 
+To ensure fairness, each user is assigned a set of “draft picks” that determines the order in which players are selected 
+(e.g., the user with pick one selects a player before the user with pick two). Players are assigned an ADP (average draft position), 
+which reflects where in the draft a player is usually taken, to guide users on when to select certain players.
+
+The goal of this project is to predict the strongest possible fantasy football team that a user could draft for a given season. 
+To achieve this, we collected data on each player and used a genetic algorithm to analyze it. 
+Teams were ranked by the total points scored by their selected players over a season. For comparison, 
+we calculated the average performance of a team composed of players selected based on their ADP at the same draft positions. 
 
 ## Features
 
